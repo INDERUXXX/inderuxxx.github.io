@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>D3 Pie Chart</title>
+    <style>
+      * { margin: 0; padding: 0; overflow: hidden; }
+    </style>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+  </head>
+  <body>
+    <script type="text/javascript">
+      let svg;
+      // カラーセット
+      const COLOR_SET = ["#DC3912", "#3366CC", "#109618", "#FF9900", "#990099"];
+      // データ作成
+      const dataSet = [
+        { "name": "A", "value": 5 },
+        { "name": "B", "value": 6 },
+        { "name": "C", "value": 8 },
+        { "name": "D", "value": 1 },
+        { "name": "E", "value": 2 },
+        { "name": "F", "value": 6 },
+        { "name": "G", "value": 8 },
+        { "name": "H", "value": 6 },
+        { "name": "I", "value": 10 },
+        { "name": "J", "value": 9 }
+      ];
+
+      window.addEventListener("DOMContentLoaded", () => draw(), false);
+      window.addEventListener("resize", () => resize(), false);
+
+      const draw = () => {
+        // constant
+        const WIDTH = window.innerWidth;
+        const HEIGHT = window.innerHeight;
+        const RADIUS = Math.min(WIDTH, HEIGHT) / 2 - 10;
+
+        svg = d3.select("body")
+          .append("svg")
+          .attr("width", WIDTH)
+          .attr("height", HEIGHT);
+        
+        const g = svg.append("g")
+          .attr("transform", `translate(${WIDTH/2}, ${HEIGHT/2})`);
+
+        const color = d3.scaleOrdinal().range(COLOR_SET);
+        
+        const pie = d3.pie()
+          .value((d) => d.value)
+          .sort(null);
+        
+        const pieGroup = g.selectAll(".pie")
+          .data(pie(dataSet))
+          .enter()
+          .append("g")
+          .attr("class", "pie");
+        
+        const arc = d3.arc()
+          .outerRadius(RADIUS)
+          .innerRadius(0);
+      
+        pieGroup.append("path")
+          .attr("d", arc)
+          .attr("fill", (d) => color(d.index))
+          .attr("opacity", 0.75)
+          .attr("stroke", "white");
+        
+        const text = d3.arc()
+          .outerRadius(RADIUS - 100)
+          .innerRadius(RADIUS - 100);
+      
+        pieGroup.append("text")
+          .attr("fill", "black")
+          .attr("transform", (d) => `translate(${text.centroid(d)})`)
+          .attr("dy", "5px")
+          .attr("font", "10px")
+          .attr("text-anchor", "middle")
+          .text((d) => d.data.name);
+      };
+
+      const resize = () => {
+        svg.remove();
+        draw();
+      };
+    </script>
+  </body>
+</html>
